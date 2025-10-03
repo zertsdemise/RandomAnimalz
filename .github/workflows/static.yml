@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cute Animal Generator</title>
+  <style>
+    body {
+      background-color: #f0f8ff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      color: #ff69b4;
+      font-size: 48px;
+      margin-bottom: 30px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+
+    button:hover {
+      background-color: #ff85c1;
+    }
+
+    img {
+      max-width: 80%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    #error {
+      color: red;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cute Animal Generator 🐶🐱🐰</h1>
+  <button onclick="getAnimal()">Show Me Something Cute!</button>
+  <div id="imageContainer">
+    <img id="animalImage" src="" alt="Cute animal will appear here!" />
+  </div>
+  <div id="error"></div>
+
+  <script>
+    async function getAnimal() {
+      const urls = [
+        'https://random.dog/woof.json',
+        'https://aws.random.cat/meow',
+        'https://api.thecatapi.com/v1/images/search',
+        'https://api.thedogapi.com/v1/images/search'
+      ];
+
+      const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+      document.getElementById('error').innerText = '';
+      document.getElementById('animalImage').src = '';
+
+      try {
+        const response = await fetch(randomUrl);
+        const data = await response.json();
+
+        let imageUrl = '';
+
+        if (data.url) imageUrl = data.url;
+        else if (data.file) imageUrl = data.file;
+        else if (Array.isArray(data) && data[0].url) imageUrl = data[0].url;
+
+        // Filter out videos or unsupported formats
+        if (imageUrl.endsWith('.mp4') || imageUrl.endsWith('.webm')) {
+          throw new Error('Received a video, not an image.');
+        }
+
+        document.getElementById('animalImage').src = imageUrl;
+      } catch (error) {
+        document.getElementById('error').innerText = 'Oops! Could not fetch a cute animal. Try again!';
+      }
+    }
+  </script>
+</body>
+</html>
